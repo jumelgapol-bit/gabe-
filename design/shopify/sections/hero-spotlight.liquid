@@ -86,9 +86,9 @@
   }
   #Hero-{{ uid }} *{box-sizing:border-box}
 
-  #Hero-{{ uid }} .hsp__media{position:absolute;inset:0;z-index:0;overflow:hidden}
+  #Hero-{{ uid }} .hsp__media{position:absolute;inset:0;z-index:0;overflow:hidden;background:{{ s.media_bg }}}
   #Hero-{{ uid }} .hsp__media img,
-  #Hero-{{ uid }} .hsp__media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ s.img_pos_x }}% {{ s.img_pos_y }}%;transform:scale({{ s.img_zoom | divided_by: 100.0 }});will-change:transform}
+  #Hero-{{ uid }} .hsp__media video{position:absolute;inset:0;width:100%;height:100%;object-fit:{{ s.img_fit }};object-position:{{ s.img_pos_x }}% {{ s.img_pos_y }}%;transform:scale({{ s.img_zoom | divided_by: 100.0 }});will-change:transform}
   #Hero-{{ uid }} .hsp__media video{opacity:0;transition:opacity 1.2s ease}
   #Hero-{{ uid }} .hsp__media video.on{opacity:1}
 
@@ -151,7 +151,7 @@
   @media (max-width:749px){
     #Hero-{{ uid }}{height:{{ s.m_height }}vh;align-items:{{ m_valign }}}
     #Hero-{{ uid }} .hsp__media img,
-    #Hero-{{ uid }} .hsp__media video{object-position:{{ s.img_pos_x_m }}% {{ s.img_pos_y_m }}%;transform:scale({{ s.img_zoom_m | divided_by: 100.0 }})}
+    #Hero-{{ uid }} .hsp__media video{object-fit:{{ s.img_fit_m }};object-position:{{ s.img_pos_x_m }}% {{ s.img_pos_y_m }}%;transform:scale({{ s.img_zoom_m | divided_by: 100.0 }})}
     #Hero-{{ uid }} .hsp__inner{padding:{{ s.m_pad_y }}px {{ s.m_pad_x }}px}
     #Hero-{{ uid }} .hsp__content{max-width:{{ s.m_content_width }}px;text-align:{{ m_text }};{% if m_text == 'center' %}margin-left:auto;margin-right:auto;{% elsif m_text == 'right' %}margin-left:auto;margin-right:0;{% else %}margin-left:0;margin-right:auto;{% endif %}}
     #Hero-{{ uid }} .hsp__eyebrow{font-size:{{ s.eyebrow_size_m }}px}
@@ -251,7 +251,8 @@
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     if(media && !reduce){
       var strength = {{ s.parallax_strength }};
-      // scale must exceed the translate range so the media never exposes the background
+      var isContain = ('{{ s.img_fit }}' === 'contain');
+      // in Cover mode the scale must exceed the translate range so the media never exposes the background
       var coverScale = 1 + (strength / 100) + 0.06;
       var raf = null;
       var onScroll = function(){
@@ -261,8 +262,11 @@
           var r = root.getBoundingClientRect();
           if(r.bottom < 0 || r.top > window.innerHeight) return;
           var prog = (window.innerHeight - r.top) / (window.innerHeight + r.height); // 0..1
-          var shift = (prog - 0.5) * strength; // centered: -strength/2 .. +strength/2
-          media.style.transform = 'translateY(' + shift + '%) scale(' + coverScale + ')';
+          var shift = (prog - 0.5) * strength; // centered
+          // Contain mode: keep the whole image visible (no cover-scale, gentle drift only)
+          media.style.transform = isContain
+            ? 'translateY(' + (shift * 0.35) + '%)'
+            : 'translateY(' + shift + '%) scale(' + coverScale + ')';
         });
       };
       window.addEventListener('scroll', onScroll, {passive:true});
@@ -284,7 +288,12 @@
     { "type": "image_picker", "id": "poster", "label": "Poster / fallback image", "info": "Shows before the video loads and on mobile." },
 
     { "type": "header", "content": "🖼️ Image / video adjust" },
-    { "type": "paragraph", "content": "Focal point moves the image within the frame (50/50 = centered). Raise vertical to show more of the top, lower to show more of the bottom." },
+    { "type": "paragraph", "content": "Fit = Cover fills the frame (may crop a wide banner). Fit = Contain shows the WHOLE image (recommended for pre-designed banners) — empty space uses the backdrop color. Focal point moves a Cover image (50/50 = centered)." },
+    { "type": "select", "id": "img_fit", "label": "Image fit (desktop)", "default": "cover", "options": [
+      { "value": "cover", "label": "Cover — fill (may crop)" }, { "value": "contain", "label": "Contain — show whole image" } ] },
+    { "type": "select", "id": "img_fit_m", "label": "Image fit (mobile)", "default": "cover", "options": [
+      { "value": "cover", "label": "Cover — fill (may crop)" }, { "value": "contain", "label": "Contain — show whole image" } ] },
+    { "type": "color", "id": "media_bg", "label": "Backdrop color (behind image)", "default": "#0E0A0A" },
     { "type": "range", "id": "img_pos_x", "min": 0, "max": 100, "step": 5, "unit": "%", "label": "Focal point — horizontal (desktop)", "default": 50 },
     { "type": "range", "id": "img_pos_y", "min": 0, "max": 100, "step": 5, "unit": "%", "label": "Focal point — vertical (desktop)", "default": 50 },
     { "type": "range", "id": "img_zoom", "min": 100, "max": 150, "step": 2, "unit": "%", "label": "Zoom (desktop)", "default": 106 },
