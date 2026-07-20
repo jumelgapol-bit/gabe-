@@ -1,0 +1,226 @@
+{%- comment -%}
+  ============================================================
+  HERO — SPOTLIGHT  ·  Layla's Dance Costumes
+  Full-screen video hero with split-line reveal + parallax.
+  Self-contained: no external JS libraries, safe to drop in.
+  Editable in Theme Customizer via the schema below.
+  ============================================================
+{%- endcomment -%}
+
+{%- comment -%} Load premium fonts once. Ideally move this <link> to theme.liquid <head>. {%- endcomment -%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+{%- assign uid = section.id -%}
+
+<style>
+  #Hero-{{ uid }}{
+    --gold:#C6A15B; --gold-lt:#E6CD97; --bone:#F5EFE7; --noir:#0E0A0A;
+    --plum:#2A1322; --wine:#4A1E36;
+    --f-display:'Lora',Georgia,serif; --f-body:'Poppins',sans-serif; --f-label:'Montserrat',sans-serif;
+    --e:cubic-bezier(.19,1,.22,1);
+    position:relative; height:{{ section.settings.height }}vh; min-height:560px;
+    display:flex; align-items:flex-end; overflow:hidden; color:var(--bone);
+    background:radial-gradient(120% 90% at 72% 15%,var(--wine),transparent 55%),linear-gradient(160deg,var(--plum),var(--noir) 60%,#0a0608);
+  }
+  #Hero-{{ uid }} *{box-sizing:border-box}
+  #Hero-{{ uid }} .hsp__media{position:absolute;inset:0;z-index:0;overflow:hidden}
+  #Hero-{{ uid }} .hsp__media img,
+  #Hero-{{ uid }} .hsp__media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:transform}
+  #Hero-{{ uid }} .hsp__media video{opacity:0;transition:opacity 1.2s ease}
+  #Hero-{{ uid }} .hsp__media video.on{opacity:1}
+  #Hero-{{ uid }} .hsp__overlay{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(14,10,10,{{ section.settings.overlay | divided_by: 100.0 }}) 0%,rgba(14,10,10,.05) 34%,rgba(14,10,10,.35) 68%,rgba(14,10,10,.9) 100%)}
+  #Hero-{{ uid }} .hsp__grain{position:absolute;inset:0;z-index:2;opacity:.05;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  #Hero-{{ uid }} .hsp__inner{position:relative;z-index:5;width:100%;max-width:1360px;margin:0 auto;padding:0 40px calc(7vh + 40px)}
+
+  #Hero-{{ uid }} .hsp__eyebrow{font-family:var(--f-label);font-size:.7rem;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-lt);display:inline-flex;align-items:center;gap:.8em;opacity:0;transform:translateY(24px);transition:opacity .9s var(--e) .1s,transform .9s var(--e) .1s}
+  #Hero-{{ uid }} .hsp__eyebrow::before{content:"";width:30px;height:1px;background:currentColor;opacity:.7}
+  #Hero-{{ uid }} .hsp__title{font-family:var(--f-display);font-weight:500;font-size:clamp(3rem,9vw,8.4rem);line-height:1.02;letter-spacing:-.035em;margin:.6rem 0 1.5rem}
+  #Hero-{{ uid }} .hsp__line{display:block;overflow:hidden;padding-bottom:.05em}
+  #Hero-{{ uid }} .hsp__line i{display:block;font-style:normal;transform:translateY(115%);transition:transform 1.1s var(--e)}
+  #Hero-{{ uid }} .hsp__title em{font-style:italic;color:var(--gold-lt)}
+  #Hero-{{ uid }} .hsp__sub{max-width:44ch;color:rgba(255,255,255,.82);font-weight:300;font-size:clamp(1rem,1.3vw,1.16rem);margin-bottom:2.3rem;opacity:0;transform:translateY(24px);transition:opacity .9s var(--e) .5s,transform .9s var(--e) .5s}
+  #Hero-{{ uid }} .hsp__cta{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;transform:translateY(24px);transition:opacity .9s var(--e) .7s,transform .9s var(--e) .7s}
+
+  #Hero-{{ uid }} .hsp-btn{position:relative;display:inline-flex;align-items:center;gap:.7em;padding:1.1em 2.2em;border-radius:60px;font-family:var(--f-label);font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;overflow:hidden;isolation:isolate;transition:color .5s var(--e)}
+  #Hero-{{ uid }} .hsp-btn--gold{color:var(--noir);background:linear-gradient(120deg,var(--gold),var(--gold-lt))}
+  #Hero-{{ uid }} .hsp-btn--gold::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--noir);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--e)}
+  #Hero-{{ uid }} .hsp-btn--gold:hover{color:var(--gold-lt)}
+  #Hero-{{ uid }} .hsp-btn--gold:hover::before{transform:scaleX(1)}
+  #Hero-{{ uid }} .hsp-btn--ghost{color:var(--bone);border:1.5px solid rgba(255,255,255,.42)}
+  #Hero-{{ uid }} .hsp-btn--ghost::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--bone);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--e)}
+  #Hero-{{ uid }} .hsp-btn--ghost:hover{color:var(--noir)}
+  #Hero-{{ uid }} .hsp-btn--ghost:hover::before{transform:scaleX(1)}
+
+  #Hero-{{ uid }} .hsp__foot{position:absolute;z-index:5;left:0;right:0;bottom:22px;display:flex;justify-content:space-between;align-items:center;padding:0 40px;font-family:var(--f-label);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);opacity:0;transition:opacity 1s var(--e) .9s}
+  #Hero-{{ uid }} .hsp__cue{display:flex;align-items:center;gap:.7rem}
+  #Hero-{{ uid }} .hsp__cue span.l{width:46px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);animation:hspCue 2.2s var(--e) infinite}
+  @keyframes hspCue{0%,100%{transform:scaleX(.3);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}}
+
+  /* revealed state */
+  #Hero-{{ uid }}.in .hsp__line i{transform:translateY(0)}
+  #Hero-{{ uid }}.in .hsp__eyebrow,
+  #Hero-{{ uid }}.in .hsp__sub,
+  #Hero-{{ uid }}.in .hsp__cta{opacity:1;transform:none}
+  #Hero-{{ uid }}.in .hsp__foot{opacity:1}
+  #Hero-{{ uid }}.in .hsp__media video.ready{opacity:1}
+
+  @media (max-width:720px){
+    #Hero-{{ uid }} .hsp__inner{padding:0 22px calc(6vh + 30px)}
+    #Hero-{{ uid }} .hsp__foot{padding:0 22px;font-size:.55rem;letter-spacing:.2em}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #Hero-{{ uid }} .hsp__line i,
+    #Hero-{{ uid }} .hsp__eyebrow,
+    #Hero-{{ uid }} .hsp__sub,
+    #Hero-{{ uid }} .hsp__cta,
+    #Hero-{{ uid }} .hsp__foot{transform:none!important;opacity:1!important;transition:none!important}
+  }
+</style>
+
+<section id="Hero-{{ uid }}" class="hsp">
+  <div class="hsp__media" data-hsp-parallax>
+    {%- if section.settings.poster != blank -%}
+      {{ section.settings.poster | image_url: width: 1800 | image_tag: loading: 'eager', class: 'hsp-poster', alt: section.settings.poster.alt | default: 'Dance costume' }}
+    {%- endif -%}
+
+    {%- if section.settings.bg_video != blank -%}
+      {{ section.settings.bg_video | video_tag: image_size: '1600x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'auto' }}
+    {%- elsif section.settings.video_url != blank -%}
+      <video autoplay muted loop playsinline preload="auto"
+        {% if section.settings.poster != blank %}poster="{{ section.settings.poster | image_url: width: 1600 }}"{% endif %}>
+        <source src="{{ section.settings.video_url }}" type="video/mp4">
+      </video>
+    {%- endif -%}
+  </div>
+
+  <div class="hsp__overlay"></div>
+  <div class="hsp__grain"></div>
+
+  <div class="hsp__inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="hsp__eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+
+    <h1 class="hsp__title">
+      {%- assign lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+      {%- for line in lines -%}
+        {%- assign clean = line | strip -%}
+        {%- if section.settings.highlight != blank and clean contains section.settings.highlight -%}
+          {%- assign clean = clean | replace: section.settings.highlight, '<em>' | append: section.settings.highlight | append: '</em>' -%}
+          {%- comment -%} simple emphasis: wrap the highlight word {%- endcomment -%}
+          {%- assign parts = line | strip | split: section.settings.highlight -%}
+          <span class="hsp__line"><i>{{ parts[0] }}<em>{{ section.settings.highlight }}</em>{{ parts[1] }}</i></span>
+        {%- else -%}
+          <span class="hsp__line"><i>{{ clean }}</i></span>
+        {%- endif -%}
+      {%- endfor -%}
+    </h1>
+
+    {%- if section.settings.subtext != blank -%}
+      <p class="hsp__sub">{{ section.settings.subtext }}</p>
+    {%- endif -%}
+
+    <div class="hsp__cta">
+      {%- if section.settings.btn1_label != blank -%}
+        <a href="{{ section.settings.btn1_link | default: '#' }}" class="hsp-btn hsp-btn--gold">{{ section.settings.btn1_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.btn2_label != blank -%}
+        <a href="{{ section.settings.btn2_link | default: '#' }}" class="hsp-btn hsp-btn--ghost">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          {{ section.settings.btn2_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.show_footnote -%}
+    <div class="hsp__foot">
+      <span class="hsp__cue"><span class="l"></span>{{ section.settings.footnote_left | default: 'Scroll to explore' }}</span>
+      <span>{{ section.settings.footnote_right | default: 'In stock · Ships in 24h' }}</span>
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  (function(){
+    var root = document.getElementById('Hero-{{ uid }}');
+    if(!root) return;
+
+    // reveal on view
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(en){
+        en.forEach(function(e){ if(e.isIntersecting){ root.classList.add('in'); io.disconnect(); } });
+      },{threshold:.2});
+      io.observe(root);
+    } else { root.classList.add('in'); }
+
+    // video fade-in when ready
+    var v = root.querySelector('video');
+    if(v){
+      var show = function(){ v.classList.add('on','ready'); };
+      if(v.readyState >= 2) show();
+      v.addEventListener('loadeddata', show);
+      v.addEventListener('canplay', show);
+      v.addEventListener('error', function(){ /* keep poster + gradient */ });
+    }
+
+    // subtle parallax on scroll
+    var media = root.querySelector('[data-hsp-parallax]');
+    var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    if(media && !reduce){
+      var raf = null;
+      var onScroll = function(){
+        if(raf) return;
+        raf = requestAnimationFrame(function(){
+          raf = null;
+          var r = root.getBoundingClientRect();
+          if(r.bottom < 0 || r.top > window.innerHeight) return;
+          var prog = (window.innerHeight - r.top) / (window.innerHeight + r.height);
+          media.style.transform = 'translateY(' + (prog * 14) + '%) scale(1.06)';
+        });
+      };
+      window.addEventListener('scroll', onScroll, {passive:true});
+      onScroll();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero — Spotlight",
+  "tag": "section",
+  "class": "section-hero-spotlight",
+  "settings": [
+    { "type": "header", "content": "Background video" },
+    { "type": "video", "id": "bg_video", "label": "Background video (upload)", "info": "Best: short, silent, looping MP4. Overrides the URL below." },
+    { "type": "text", "id": "video_url", "label": "…or external MP4 URL", "info": "Direct .mp4 link if you host the video elsewhere." },
+    { "type": "image_picker", "id": "poster", "label": "Poster / fallback image", "info": "Shown before the video loads and on mobile." },
+    { "type": "range", "id": "overlay", "min": 20, "max": 90, "step": 5, "unit": "%", "label": "Top overlay darkness", "default": 50 },
+    { "type": "range", "id": "height", "min": 60, "max": 100, "step": 5, "unit": "vh", "label": "Section height", "default": 100 },
+
+    { "type": "header", "content": "Text" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Contemporary & Lyrical Dance Costumes" },
+    { "type": "textarea", "id": "heading", "label": "Heading (one line per row)", "default": "Costumes made\nfor the spotlight." },
+    { "type": "text", "id": "highlight", "label": "Highlight word (italic gold)", "default": "spotlight." },
+    { "type": "textarea", "id": "subtext", "label": "Sub-text", "default": "Studio-quality lyrical, jazz, tap & ballet costumes — designed with love, in stock, and on their way to your recital in 24 hours." },
+
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "btn1_label", "label": "Primary button label", "default": "Shop the 2026 Collection" },
+    { "type": "url", "id": "btn1_link", "label": "Primary button link" },
+    { "type": "text", "id": "btn2_label", "label": "Secondary button label", "default": "Watch the Film" },
+    { "type": "url", "id": "btn2_link", "label": "Secondary button link" },
+
+    { "type": "header", "content": "Footnote" },
+    { "type": "checkbox", "id": "show_footnote", "label": "Show bottom footnote", "default": true },
+    { "type": "text", "id": "footnote_left", "label": "Footnote left", "default": "Scroll to explore" },
+    { "type": "text", "id": "footnote_right", "label": "Footnote right", "default": "In stock · Ships in 24h" }
+  ],
+  "presets": [
+    { "name": "Hero — Spotlight" }
+  ]
+}
+{% endschema %}
